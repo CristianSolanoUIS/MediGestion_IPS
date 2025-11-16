@@ -1,0 +1,125 @@
+/* Estilos globales compartidos para el Panel del Director */
+
+/* Variables de color */
+:root {
+  --primary-purple: #8B5CF6;
+  --primary-purple-hover: #7C3AED;
+  --background-light: #F8F5FF;
+  --card-border: #E3E6F0;
+  --text-primary: #111;
+  --text-secondary: #666;
+  --text-gray: #333;
+}
+
+/* Clase base para portal director */
+.director-portal {
+  min-height: 100vh;
+  background-color: var(--background-light);
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.portal-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px;
+  box-sizing: border-box;
+}
+
+/* Estilos compartidos para encabezados de página */
+.page-header {
+  margin-bottom: 32px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.back-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.back-button:hover {
+  background-color: var(--card-border);
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 4px 0;
+}
+
+.page-subtitle {
+  font-size: 15px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.welcome-header {
+  margin-bottom: 32px;
+}
+
+.welcome-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 8px 0;
+}
+
+.welcome-subtitle {
+  font-size: 16px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* Estilos para píldoras de estado */
+.status-badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.status-confirmed {
+  background-color: #D1FAE5;
+  color: #065F46;
+}
+
+.status-pending {
+  background-color: #FEF3C7;
+  color: #92400E;
+}
+
+.status-cancelled {
+  background-color: #FEE2E2;
+  color: #991B1B;
+}
+
+
+@media (max-width: 768px) {
+  .portal-content {
+    padding: 24px 20px;
+  }
+
+  .page-title,
+  .welcome-title {
+    font-size: 24px;
+  }
+
+  .page-subtitle,
+  .welcome-subtitle {
+    font-size: 14px;
+  }
+}
+

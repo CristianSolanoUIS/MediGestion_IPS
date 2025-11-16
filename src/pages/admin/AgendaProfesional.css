@@ -1,0 +1,131 @@
+.filter-card {
+  background-color: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #E3E6F0;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.filter-card-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111;
+  margin: 0 0 16px 0;
+}
+
+.filter-select {
+  width: 100%;
+  height: 44px;
+  padding: 0 16px;
+  background-color: #f3f3f5;
+  border: 1px solid #E3E6F0;
+  border-radius: 10px;
+  font-size: 15px;
+  color: #111;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  padding-right: 40px;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: #F97316;
+  background-color: #ffffff;
+}
+
+.agendas-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.agenda-card {
+  background-color: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #E3E6F0;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  position: relative;
+}
+
+.agenda-id-badge {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  font-size: 12px;
+  color: #666;
+}
+
+.agenda-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+}
+
+.agenda-column-left {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.agenda-profesional-name {
+  font-size: 20px;
+  font-weight: 700;
+  color: #111;
+  margin: 0;
+}
+
+.agenda-details {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.agenda-detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.agenda-detail-label {
+  font-size: 13px;
+  color: #666;
+  font-weight: 500;
+}
+
+.agenda-detail-value {
+  font-size: 15px;
+  color: #111;
+  font-weight: 600;
+}
+
+.agenda-detail-value.highlight {
+  font-size: 18px;
+  color: #F97316;
+}
+
+.agenda-column-right {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+@media (max-width: 768px) {
+  .agenda-content {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .agenda-id-badge {
+    position: relative;
+    top: auto;
+    right: auto;
+    margin-bottom: 16px;
+  }
+}
+

@@ -1,0 +1,225 @@
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 32px;
+}
+
+.metric-card {
+  background-color: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #E3E6F0;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.metric-value {
+  font-size: 36px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.metric-blue {
+  color: #1A67FD;
+}
+
+.metric-green {
+  color: #16A34A;
+}
+
+.metric-orange {
+  color: #F97316;
+}
+
+.metric-label {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+}
+
+/* Card Citas del Día */
+.citas-card {
+  background-color: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #E3E6F0;
+  padding: 32px;
+  margin-bottom: 32px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.citas-card-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #111;
+  margin: 0 0 24px 0;
+}
+
+.citas-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cita-row {
+  background-color: #ffffff;
+  border: 1px solid #E3E6F0;
+  border-radius: 12px;
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: box-shadow 0.2s ease;
+}
+
+.cita-row:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.cita-row-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+}
+
+.cita-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background-color: #F5F7FF;
+  border-radius: 50%;
+}
+
+.cita-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cita-paciente {
+  font-size: 16px;
+  font-weight: 700;
+  color: #111;
+}
+
+.cita-id {
+  font-size: 13px;
+  color: #666;
+}
+
+.cita-row-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.cita-hora {
+  font-size: 15px;
+  color: #333;
+  font-weight: 600;
+}
+
+/* Acciones principales */
+.actions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.action-card {
+  background-color: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #E3E6F0;
+  padding: 32px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+}
+
+.action-card-header {
+  margin-bottom: 20px;
+}
+
+.action-icon {
+  width: 32px;
+  height: 32px;
+}
+
+.action-card-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #111;
+  margin: 0 0 8px 0;
+}
+
+.action-card-subtitle {
+  font-size: 15px;
+  color: #666;
+  margin: 0 0 24px 0;
+  flex: 1;
+}
+
+.btn-primary-blue {
+  width: 100%;
+  height: 48px;
+  background-color: #1A67FD;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.btn-primary-blue:hover {
+  background-color: #155DFC;
+  transform: translateY(-1px);
+}
+
+.btn-primary-green {
+  width: 100%;
+  height: 48px;
+  background-color: #16A34A;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.btn-primary-green:hover {
+  background-color: #15803D;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .actions-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cita-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .cita-row-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
