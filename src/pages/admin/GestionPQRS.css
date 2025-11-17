@@ -64,11 +64,58 @@
   font-weight: 500;
   font-size: 14px;
   transition: color 0.2s ease;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
 }
 
 .link-assign:hover {
   color: #EA580C;
   text-decoration: underline;
+}
+
+.link-assign:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  text-decoration: none;
+}
+
+.table-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.table-loading,
+.table-error,
+.table-success,
+.table-empty {
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 14px;
+}
+
+.table-loading {
+  background: #F1F5F9;
+  color: #475569;
+}
+
+.table-error {
+  background: #FEF2F2;
+  color: #B91C1C;
+}
+
+.table-success {
+  background: #DCFCE7;
+  color: #166534;
+}
+
+.table-empty {
+  background: #F9FAFB;
+  color: #475569;
+  text-align: center;
 }
 
 @media (max-width: 768px) {

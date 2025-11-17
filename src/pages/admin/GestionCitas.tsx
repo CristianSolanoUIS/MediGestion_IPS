@@ -3,7 +3,20 @@ import { useNavigate } from 'react-router-dom';
 import NavbarAdmin from '../../components/NavbarAdmin';
 import '../../styles/AdminPortal.css';
 import './GestionCitas.css';
-import { request, isHttpError } from '../../services/httpClient';
+import { isHttpError } from '../../services/httpClient';
+import {
+  cancelarCita,
+  crearCita,
+  fetchCitaPorId,
+  listarCitas,
+  marcarCitaEnSala,
+  marcarCitaNoAsistida,
+  reprogramarCita,
+  confirmarCita,
+  eliminarCita,
+  type CitaDetalle
+} from '../../services/citas';
+import { listarEstadosCita, type EstadoCita } from '../../services/estadosCita';
 
 interface AppointmentRecord {
   id?: number | string;
@@ -146,6 +159,42 @@ const formatAppointmentRow = (appointment: AppointmentRecord): AppointmentRow =>
   };
 };
 
+const getTodayDateString = (): string => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = `${now.getMonth() + 1}`.padStart(2, '0');
+  const day = `${now.getDate()}`.padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+const toDisplayText = (value: unknown, fallback = ''): string => {
+  if (value === undefined || value === null) {
+    return fallback;
+  }
+  const text = String(value).trim();
+  return text.length ? text : fallback;
+};
+
+type GenericEntity = Record<string, unknown> | null | undefined;
+
+const readEntityValue = (record: GenericEntity, key: string): unknown => {
+  if (record && typeof record === 'object') {
+    return (record as Record<string, unknown>)[key];
+  }
+  return undefined;
+};
+
+const formatPersonInfo = (record: GenericEntity): { name: string; id: string } => {
+  const first = toDisplayText(readEntityValue(record, 'nombre'), '');
+  const last = toDisplayText(readEntityValue(record, 'apellido'), '');
+  const id = toDisplayText(readEntityValue(record, 'id'), '');
+  const combined = `${first} ${last}`.trim();
+  return {
+    name: combined || first || last || '—',
+    id
+  };
+};
+
 const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 const TIME_REGEX = /^\d{2}:\d{2}(?::\d{2})?$/;
 const PAGE_SIZE = 8;
@@ -164,9 +213,21 @@ const EMPTY_CREATE_VALUES: CreateAppointmentValues = {
   time: ''
 };
 
+interface FiltersState {
+  fecha: string;
+  profesionalId: string;
+}
+
+const DEFAULT_FILTERS: FiltersState = {
+  fecha: getTodayDateString(),
+  profesionalId: ''
+};
+
 const GestionCitas: React.FC = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [filters, setFilters] = useState<FiltersState>(DEFAULT_FILTERS);
+  const [pendingFilters, setPendingFilters] = useState<FiltersState>(DEFAULT_FILTERS);
   const [appointments, setAppointments] = useState<AppointmentRow[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -182,30 +243,55 @@ const GestionCitas: React.FC = () => {
   const [reprogramValues, setReprogramValues] = useState<{ date: string; time: string }>({ date: '', time: '' });
   const [reprogramError, setReprogramError] = useState<string | null>(null);
   const [isReprogramming, setIsReprogramming] = useState<boolean>(false);
+  const [statusCatalog, setStatusCatalog] = useState<Record<string, EstadoCita>>({});
+  const [selectedRowId, setSelectedRowId] = useState<string | null>(null);
+  const [selectedNumericId, setSelectedNumericId] = useState<number | null>(null);
+  const [selectedDetail, setSelectedDetail] = useState<CitaDetalle | null>(null);
+  const [detailLoading, setDetailLoading] = useState<boolean>(false);
+  const [detailError, setDetailError] = useState<string | null>(null);
+  const [detailAction, setDetailAction] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
 
   const loadAppointments = useCallback(
-    async (options?: { signal?: AbortSignal }): Promise<boolean> => {
-      const { signal } = options ?? {};
+    async (options?: { signal?: AbortSignal; sourceFilters?: FiltersState }): Promise<boolean> => {
+      const { signal, sourceFilters } = options ?? {};
+      const criteria = sourceFilters ?? filters;
       setIsLoading(true);
       setErrorMessage(null);
 
-      let succeeded = false;
-
       try {
-        const payload = await request<unknown>('/citas', { signal });
-        const items = Array.isArray(payload)
-          ? payload
-          : (payload && typeof payload === 'object'
-              ? ((payload as Record<string, unknown>).items as unknown[]) ??
-                ((payload as Record<string, unknown>).data as unknown[]) ??
-                ((payload as Record<string, unknown>).results as unknown[]) ??
-                []
-              : []);
+        const params: { fecha?: string; profesionalId?: number } = {};
+        if (criteria.fecha) {
+          params.fecha = criteria.fecha;
+        }
+        const profesionIdNumeric = parseNumericId(criteria.profesionalId);
+        if (profesionIdNumeric !== null) {
+          params.profesionalId = profesionIdNumeric;
+        }
 
-        const mapped = (items as AppointmentRecord[]).map(formatAppointmentRow);
+        const response = await listarCitas(params, signal);
+        const payload = (Array.isArray(response)
+          ? response
+          : response && typeof response === 'object'
+            ? ((response as Record<string, unknown>).items as AppointmentRecord[]) ??
+              ((response as Record<string, unknown>).data as AppointmentRecord[]) ??
+              ((response as Record<string, unknown>).results as AppointmentRecord[]) ??
+              []
+            : []) as AppointmentRecord[];
+
+        const mapped = payload.map((item) => formatAppointmentRow(item));
         setAppointments(mapped);
-        succeeded = true;
+
+        if (selectedNumericId !== null) {
+          const stillExists = mapped.some((row) => (row.rawId ?? parseNumericId(row.id)) === selectedNumericId);
+          if (!stillExists) {
+            setSelectedNumericId(null);
+            setSelectedRowId(null);
+            setSelectedDetail(null);
+          }
+        }
+
+        return true;
       } catch (error) {
         if (signal?.aborted) {
           return false;
@@ -218,15 +304,14 @@ const GestionCitas: React.FC = () => {
         } else {
           setErrorMessage('No se pudieron cargar las citas.');
         }
+        return false;
       } finally {
-        if (!signal || !signal.aborted) {
+        if (!signal?.aborted) {
           setIsLoading(false);
         }
       }
-
-      return succeeded;
     },
-    []
+    [filters, selectedNumericId]
   );
 
   useEffect(() => {
@@ -236,6 +321,92 @@ const GestionCitas: React.FC = () => {
       controller.abort();
     };
   }, [loadAppointments]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    listarEstadosCita(controller.signal)
+      .then((data) => {
+        const mapping: Record<string, EstadoCita> = {};
+        data?.forEach((estado) => {
+          const key = normalizeStatus(estado.codigo);
+          if (key) {
+            mapping[key] = estado;
+          }
+        });
+        setStatusCatalog(mapping);
+      })
+      .catch((error) => {
+        if (controller.signal.aborted) {
+          return;
+        }
+        console.warn('No se pudieron cargar los estados de cita', error);
+      });
+    return () => controller.abort();
+  }, []);
+
+  const refreshDetail = useCallback(
+    async (appointmentId: number, signal?: AbortSignal): Promise<void> => {
+      setDetailLoading(true);
+      setDetailError(null);
+      try {
+        const detail = await fetchCitaPorId(appointmentId, signal);
+        if (!signal?.aborted) {
+          setSelectedDetail(detail);
+        }
+      } catch (error) {
+        if (signal?.aborted) {
+          return;
+        }
+        if (isHttpError(error)) {
+          setDetailError(error.message);
+        } else if (error instanceof Error) {
+          setDetailError(error.message);
+        } else {
+          setDetailError('No se pudo cargar el detalle de la cita.');
+        }
+      } finally {
+        if (!signal?.aborted) {
+          setDetailLoading(false);
+        }
+      }
+    },
+    []
+  );
+
+  useEffect(() => {
+    if (selectedNumericId === null) {
+      setSelectedDetail(null);
+      setDetailError(null);
+      return;
+    }
+    const controller = new AbortController();
+    void refreshDetail(selectedNumericId, controller.signal);
+    return () => controller.abort();
+  }, [refreshDetail, selectedNumericId]);
+
+  const runAppointmentAction = useCallback(
+    async ({ appointmentId, successMessage, action }: { appointmentId: number; successMessage: string; action: () => Promise<unknown> }) => {
+      setActionError(null);
+      setActionSuccess(null);
+      try {
+        await action();
+        const refreshed = await loadAppointments();
+        if (selectedNumericId === appointmentId) {
+          await refreshDetail(appointmentId);
+        }
+        setActionSuccess(refreshed ? successMessage : `${successMessage} Refresca la tabla para ver los cambios.`);
+      } catch (error) {
+        if (isHttpError(error)) {
+          setActionError(error.message);
+        } else if (error instanceof Error) {
+          setActionError(error.message);
+        } else {
+          setActionError('Ocurrió un error inesperado al intentar procesar la cita.');
+        }
+      }
+    },
+    [loadAppointments, refreshDetail, selectedNumericId]
+  );
 
   const citasFiltradas = useMemo(() => {
     if (!searchTerm) {
@@ -370,24 +541,17 @@ const GestionCitas: React.FC = () => {
     setIsCreating(true);
 
     try {
-      await request('/citas', {
-        method: 'POST',
-        body: {
-          idPaciente: patientNumeric,
-          idPersonalSalud: professionalNumeric,
-          fecha: trimmed.date,
-          hora: trimmed.time
-        }
+      await crearCita({
+        idPaciente: patientNumeric,
+        idPersonalSalud: professionalNumeric,
+        fecha: trimmed.date,
+        hora: trimmed.time
       });
 
       setIsCreateModalOpen(false);
       setCreateValues(EMPTY_CREATE_VALUES);
       const refreshed = await loadAppointments();
-      if (refreshed) {
-        setActionSuccess('La cita se creó correctamente.');
-      } else {
-        setActionError('La cita se creó, pero no pudimos refrescar la lista.');
-      }
+      setActionSuccess(refreshed ? 'La cita se creó correctamente.' : 'La cita se creó, pero no pudimos refrescar la lista.');
     } catch (error) {
       if (isHttpError(error)) {
         setCreateError(error.message);
@@ -401,7 +565,8 @@ const GestionCitas: React.FC = () => {
     }
   };
 
-  const handleCancelAppointment = async (appointment: AppointmentRow): Promise<void> => {
+  const handleCancelAppointment = async (appointment: AppointmentRow, event?: React.MouseEvent<HTMLButtonElement>): Promise<void> => {
+    event?.stopPropagation();
     const numericId = appointment.rawId ?? parseNumericId(appointment.id);
     if (numericId === null) {
       setActionError('No pudimos identificar el ID numérico de la cita para cancelarla.');
@@ -418,16 +583,14 @@ const GestionCitas: React.FC = () => {
     setActionSuccess(null);
 
     try {
-      await request(`/citas/${numericId}/cancelar`, {
-        method: 'PATCH'
-      });
+      const motivo = window.prompt('Motivo de cancelación (opcional)')?.trim();
+      await cancelarCita(numericId, motivo ? { motivo } : {});
 
       const refreshed = await loadAppointments();
-      if (refreshed) {
-        setActionSuccess(`La cita ${appointment.id} se canceló correctamente.`);
-      } else {
-        setActionError('La cita se canceló, pero no pudimos refrescar la lista.');
+      if (selectedNumericId === numericId) {
+        await refreshDetail(numericId);
       }
+      setActionSuccess(refreshed ? `La cita ${appointment.id} se canceló correctamente.` : 'La cita se canceló, pero no pudimos refrescar la lista.');
     } catch (error) {
       if (isHttpError(error)) {
         setActionError(error.message);
@@ -480,12 +643,9 @@ const GestionCitas: React.FC = () => {
     setIsReprogramming(true);
 
     try {
-      await request(`/citas/${numericId}/reprogramar`, {
-        method: 'PATCH',
-        body: {
-          fecha: trimmedDate,
-          hora: trimmedTime
-        }
+      await reprogramarCita(numericId, {
+        fecha: trimmedDate,
+        hora: trimmedTime
       });
 
       setIsReprogramModalOpen(false);
@@ -493,11 +653,10 @@ const GestionCitas: React.FC = () => {
       setReprogramValues({ date: '', time: '' });
 
       const refreshed = await loadAppointments();
-      if (refreshed) {
-        setActionSuccess(`La cita ${targetId} se reprogramó correctamente.`);
-      } else {
-        setActionError('La cita se reprogramó, pero no pudimos refrescar la lista.');
+      if (selectedNumericId === numericId) {
+        await refreshDetail(numericId);
       }
+      setActionSuccess(refreshed ? `La cita ${targetId} se reprogramó correctamente.` : 'La cita se reprogramó, pero no pudimos refrescar la lista.');
     } catch (error) {
       if (isHttpError(error)) {
         setReprogramError(error.message);
@@ -510,6 +669,117 @@ const GestionCitas: React.FC = () => {
       setIsReprogramming(false);
     }
   };
+
+  const handleRowClick = (appointment: AppointmentRow): void => {
+    const numericId = appointment.rawId ?? parseNumericId(appointment.id);
+    if (numericId === null) {
+      setDetailError('No pudimos obtener el detalle de esta cita.');
+      return;
+    }
+    setSelectedRowId(appointment.id);
+    setSelectedNumericId(numericId);
+  };
+
+  const currentSelectedRow = useMemo(() => appointments.find((row) => row.id === selectedRowId) ?? null, [appointments, selectedRowId]);
+
+  const handleFiltersSubmit = (event: FormEvent<HTMLFormElement>): void => {
+    event.preventDefault();
+    setFilters(pendingFilters);
+  };
+
+  const handleFilterChange = (field: keyof FiltersState) => (event: ChangeEvent<HTMLInputElement>): void => {
+    setPendingFilters((prev) => ({ ...prev, [field]: event.target.value }));
+  };
+
+  const handleClearFilters = (): void => {
+    setPendingFilters(DEFAULT_FILTERS);
+    setFilters(DEFAULT_FILTERS);
+  };
+
+  const handleConfirmSelected = async (): Promise<void> => {
+    if (!selectedNumericId) return;
+    setDetailAction('confirm');
+    try {
+      await runAppointmentAction({
+        appointmentId: selectedNumericId,
+        successMessage: 'La cita fue confirmada.',
+        action: () => confirmarCita(selectedNumericId)
+      });
+    } finally {
+      setDetailAction(null);
+    }
+  };
+
+  const handleCheckInSelected = async (): Promise<void> => {
+    if (!selectedNumericId) return;
+    setDetailAction('checkin');
+    try {
+      await runAppointmentAction({
+        appointmentId: selectedNumericId,
+        successMessage: 'El paciente fue marcado en sala.',
+        action: () => marcarCitaEnSala(selectedNumericId)
+      });
+    } finally {
+      setDetailAction(null);
+    }
+  };
+
+  const handleNoShowSelected = async (): Promise<void> => {
+    if (!selectedNumericId) return;
+    setDetailAction('noshow');
+    try {
+      await runAppointmentAction({
+        appointmentId: selectedNumericId,
+        successMessage: 'La cita se marcó como no asistida.',
+        action: () => marcarCitaNoAsistida(selectedNumericId)
+      });
+    } finally {
+      setDetailAction(null);
+    }
+  };
+
+  const handleDeleteSelected = async (): Promise<void> => {
+    if (!selectedNumericId || !currentSelectedRow) return;
+    const confirmed = window.confirm(`¿Eliminar definitivamente la cita ${currentSelectedRow.id}?`);
+    if (!confirmed) return;
+    setDetailAction('delete');
+    try {
+      await runAppointmentAction({
+        appointmentId: selectedNumericId,
+        successMessage: 'La cita fue eliminada.',
+        action: () => eliminarCita(selectedNumericId)
+      });
+      setSelectedNumericId(null);
+      setSelectedRowId(null);
+    } finally {
+      setDetailAction(null);
+    }
+  };
+
+  const statusLabelFor = useCallback(
+    (status: string): { label: string; color?: string } => {
+      const key = normalizeStatus(status);
+      const meta = statusCatalog[key];
+      if (meta) {
+        return { label: meta.nombre, color: meta.colorHex };
+      }
+      if (!status) {
+        return { label: '—' };
+      }
+      const pretty = status.replace(/_/g, ' ');
+      return { label: pretty.charAt(0).toUpperCase() + pretty.slice(1) };
+    },
+    [statusCatalog]
+  );
+
+  const openReprogramFromDetail = (): void => {
+    if (currentSelectedRow) {
+      openReprogramModal(currentSelectedRow);
+    }
+  };
+
+  const pacienteInfo = selectedDetail ? formatPersonInfo(selectedDetail.paciente) : null;
+  const profesionalInfo = selectedDetail ? formatPersonInfo(selectedDetail.profesional) : null;
 
   return (
     <div className="admin-portal">
@@ -529,6 +799,27 @@ const GestionCitas: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {/* Filtros */}
+        <form className="filters-card" onSubmit={handleFiltersSubmit}>
+          <div className="filter-field">
+            <span>Fecha</span>
+            <input type="date" value={pendingFilters.fecha} onChange={handleFilterChange('fecha')} />
+          </div>
+          <div className="filter-field">
+            <span>ID Profesional</span>
+            <input
+              type="text"
+              value={pendingFilters.profesionalId}
+              onChange={handleFilterChange('profesionalId')}
+              placeholder="Ej. 45 o PS-045"
+            />
+          </div>
+          <div className="filter-actions">
+            <button type="submit" className="btn-filter primary">Aplicar</button>
+            <button type="button" className="btn-filter ghost" onClick={handleClearFilters}>Limpiar</button>
+          </div>
+        </form>
 
         {/* Barra de búsqueda y botón de creación */}
         <div className="search-bar">
@@ -553,9 +844,10 @@ const GestionCitas: React.FC = () => {
           </button>
         </div>
 
-        {/* Tabla de citas */}
-        <div className="table-card">
-          <table className="citas-table">
+        <div className="citas-content-grid">
+          {/* Tabla de citas */}
+          <div className="table-card">
+            <table className="citas-table">
             <thead>
               <tr>
                 <th>ID Cita</th>
@@ -583,15 +875,24 @@ const GestionCitas: React.FC = () => {
               {!isLoading && paginatedCitas.map((cita) => {
                 const statusKey = cita.estado.toLowerCase();
                 const isCancelling = cancellingId === cita.id;
+                const { label: statusLabel, color } = statusLabelFor(cita.estado);
                 const statusClass =
                   statusKey === 'confirmada'
                     ? 'status-confirmed'
                     : statusKey === 'pendiente'
                     ? 'status-pending'
-                    : 'status-cancelled';
+                    : statusKey === 'ensala'
+                    ? 'status-inroom'
+                    : statusKey === 'cancelada'
+                    ? 'status-cancelled'
+                    : 'status-neutral';
 
                 return (
-                  <tr key={cita.id}>
+                  <tr
+                    key={cita.id}
+                    className={selectedRowId === cita.id ? 'row-selected' : ''}
+                    onClick={() => handleRowClick(cita)}
+                  >
                   <td>{cita.id}</td>
                   <td>
                     <div className="cell-two-lines">
@@ -608,8 +909,8 @@ const GestionCitas: React.FC = () => {
                   <td>{cita.fecha}</td>
                   <td>{cita.hora}</td>
                   <td>
-                    <span className={`status-badge ${statusClass}`}>
-                      {cita.estado}
+                    <span className={`status-badge ${statusClass}`} style={color ? { backgroundColor: color, color: '#fff' } : undefined}>
+                      {statusLabel}
                     </span>
                   </td>
                   <td>
@@ -617,7 +918,10 @@ const GestionCitas: React.FC = () => {
                       <button
                         type="button"
                         className="link-edit"
-                        onClick={() => openReprogramModal(cita)}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          openReprogramModal(cita);
+                        }}
                         disabled={isReprogramming && reprogramTarget?.id === cita.id}
                       >
                         {isReprogramming && reprogramTarget?.id === cita.id ? 'Reprogramando…' : 'Reprogramar'}
@@ -625,7 +929,7 @@ const GestionCitas: React.FC = () => {
                       <button
                         type="button"
                         className="link-cancel"
-                        onClick={() => void handleCancelAppointment(cita)}
+                        onClick={(event) => void handleCancelAppointment(cita, event)}
                         disabled={isCancelling}
                       >
                         {isCancelling ? 'Cancelando…' : 'Cancelar'}
@@ -637,6 +941,106 @@ const GestionCitas: React.FC = () => {
               })}
             </tbody>
           </table>
+        </div>
+
+          {/* Panel detalle */}
+          <aside className="detail-panel">
+            <h2>Detalle de la cita</h2>
+            {!selectedRowId && <p className="detail-placeholder">Selecciona una cita de la tabla para ver su detalle.</p>}
+            {selectedRowId && (
+              <>
+                {detailLoading && <p className="detail-placeholder">Cargando detalle…</p>}
+                {detailError && <p className="detail-error">{detailError}</p>}
+                {!detailLoading && !detailError && selectedDetail && (
+                  <div className="detail-content">
+                    <div className="detail-grid">
+                      <div className="detail-block">
+                        <span className="detail-label">Cita</span>
+                        <strong className="detail-value">#{selectedDetail.id}</strong>
+                      </div>
+                      <div className="detail-block">
+                        <span className="detail-label">Estado</span>
+                        <span className="detail-chip">{statusLabelFor(String(selectedDetail.estado ?? '')).label}</span>
+                      </div>
+                      <div className="detail-block">
+                        <span className="detail-label">Fecha</span>
+                        <span className="detail-value">{selectedDetail.fecha}</span>
+                      </div>
+                      <div className="detail-block">
+                        <span className="detail-label">Hora</span>
+                        <span className="detail-value">{selectedDetail.hora}</span>
+                      </div>
+                      <div className="detail-block">
+                        <span className="detail-label">Paciente</span>
+                        <span className="detail-value">{pacienteInfo?.name ?? '—'}</span>
+                        {pacienteInfo?.id && <span className="detail-subvalue">ID: {pacienteInfo.id}</span>}
+                      </div>
+                      <div className="detail-block">
+                        <span className="detail-label">Profesional</span>
+                        <span className="detail-value">{profesionalInfo?.name ?? '—'}</span>
+                        {profesionalInfo?.id && <span className="detail-subvalue">ID: {profesionalInfo.id}</span>}
+                      </div>
+                      {selectedDetail.motivo && (
+                        <div className="detail-block full">
+                          <span className="detail-label">Motivo</span>
+                          <p className="detail-text">{String(selectedDetail.motivo)}</p>
+                        </div>
+                      )}
+                      {selectedDetail.notas && (
+                        <div className="detail-block full">
+                          <span className="detail-label">Notas</span>
+                          <p className="detail-text">{String(selectedDetail.notas)}</p>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="detail-actions">
+                      <button
+                        type="button"
+                        className="detail-btn primary"
+                        onClick={handleConfirmSelected}
+                        disabled={!selectedNumericId || detailAction === 'confirm'}
+                      >
+                        {detailAction === 'confirm' ? 'Confirmando…' : 'Confirmar'}
+                      </button>
+                      <button
+                        type="button"
+                        className="detail-btn outline"
+                        onClick={openReprogramFromDetail}
+                        disabled={!currentSelectedRow}
+                      >
+                        Reprogramar
+                      </button>
+                      <button
+                        type="button"
+                        className="detail-btn neutral"
+                        onClick={handleCheckInSelected}
+                        disabled={!selectedNumericId || detailAction === 'checkin'}
+                      >
+                        {detailAction === 'checkin' ? 'Marcando…' : 'Check-in'}
+                      </button>
+                      <button
+                        type="button"
+                        className="detail-btn warn"
+                        onClick={handleNoShowSelected}
+                        disabled={!selectedNumericId || detailAction === 'noshow'}
+                      >
+                        {detailAction === 'noshow' ? 'Aplicando…' : 'No asistió'}
+                      </button>
+                      <button
+                        type="button"
+                        className="detail-btn danger"
+                        onClick={handleDeleteSelected}
+                        disabled={!selectedNumericId || detailAction === 'delete'}
+                      >
+                        {detailAction === 'delete' ? 'Eliminando…' : 'Eliminar'}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+          </aside>
         </div>
 
         {!isLoading && totalFiltered > PAGE_SIZE && (

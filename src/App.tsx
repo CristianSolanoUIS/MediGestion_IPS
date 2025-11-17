@@ -4,7 +4,6 @@ import Login from './Login';
 import RoleSelection from './pages/RoleSelection';
 import Dashboard from './pages/Dashboard';
 import MisCitas from './pages/MisCitas';
-import AgendarCita from './pages/AgendarCita';
 import Notificaciones from './pages/Notificaciones';
 import PQRS from './pages/PQRS';
 import DashboardProfesional from './pages/profesional/DashboardProfesional';
@@ -32,7 +31,6 @@ const App: React.FC = () => {
         {/* Rutas del Portal del Paciente */}
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/mis-citas" element={<MisCitas />} />
-        <Route path="/agendar-cita" element={<AgendarCita />} />
         <Route path="/notificaciones" element={<Notificaciones />} />
         <Route path="/pqrs" element={<PQRS />} />
         {/* Rutas del Panel Profesional */}

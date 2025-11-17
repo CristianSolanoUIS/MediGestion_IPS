@@ -10,7 +10,7 @@ import {
   actualizarAgenda,
   eliminarAgenda,
   type AgendaResponse
-} from '../../services/agendas';
+} from '../../services/agendaService';
 
 interface NewAgendaForm {
   fechaInicio: string;

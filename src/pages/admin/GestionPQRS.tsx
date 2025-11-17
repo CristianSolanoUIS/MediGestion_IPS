@@ -1,55 +1,112 @@
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import NavbarAdmin from '../../components/NavbarAdmin';
 import '../../styles/AdminPortal.css';
 import './GestionPQRS.css';
+import { listarPQRS, actualizarPQRS, type PqrsItem } from '../../services/pqrs';
+import { getUser } from '../../services/authStorage';
+import { isHttpError } from '../../services/httpClient';
 
-interface PQRSItem {
-  id: string;
-  paciente: number;
-  tipo: string;
-  estado: string;
-  fechaRadicado: string;
-  sla: string;
-  responsable: string;
-  fechaCompromiso: string;
-}
+const formatDate = (value?: string | null): string => {
+  if (!value) {
+    return '—';
+  }
+  const match = value.match(/\d{4}-\d{2}-\d{2}/);
+  return match ? match[0] : value;
+};
+
+const formatSla = (value?: string | null): string => {
+  if (!value) {
+    return '—';
+  }
+  const trimmed = value.trim();
+  return trimmed.length ? trimmed : '—';
+};
+
+const toDisplay = (value?: string | number | null): string => {
+  if (value === undefined || value === null) {
+    return '—';
+  }
+  const text = String(value).trim();
+  return text.length ? text : '—';
+};
 
 const GestionPQRS: React.FC = () => {
   const navigate = useNavigate();
+  const [pqrsList, setPqrsList] = useState<PqrsItem[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [assigningId, setAssigningId] = useState<number | string | null>(null);
+  const currentUser = getUser();
 
-  const pqrsList: PQRSItem[] = [
-    {
-      id: 'PQRS-1001',
-      paciente: 1001,
-      tipo: 'Queja',
-      estado: 'En revisión',
-      fechaRadicado: '2025-11-10',
-      sla: '15 días',
-      responsable: 'Administrativo 1',
-      fechaCompromiso: '2025-11-25',
-    },
-    {
-      id: 'PQRS-1002',
-      paciente: 1002,
-      tipo: 'Petición',
-      estado: 'Resuelta',
-      fechaRadicado: '2025-11-05',
-      sla: '15 días',
-      responsable: 'Administrador de PQRS',
-      fechaCompromiso: '2025-11-20',
-    },
-    {
-      id: 'PQRS-1003',
-      paciente: 1003,
-      tipo: 'Reclamo',
-      estado: 'En revisión',
-      fechaRadicado: '2025-11-12',
-      sla: '10 días',
-      responsable: 'Administrativo 2',
-      fechaCompromiso: '2025-11-22',
-    },
-  ];
+  const loadPQRS = useCallback(async (options?: { signal?: AbortSignal; silent?: boolean }): Promise<void> => {
+    const { signal, silent } = options ?? {};
+    if (!silent) {
+      setIsLoading(true);
+    }
+    setErrorMessage(null);
+    try {
+      const data = await listarPQRS({}, signal);
+      if (!signal?.aborted) {
+        setPqrsList(data);
+      }
+    } catch (error) {
+      if (signal?.aborted) {
+        return;
+      }
+      if (isHttpError(error)) {
+        setErrorMessage(error.message);
+      } else if (error instanceof Error) {
+        setErrorMessage(error.message);
+      } else {
+        setErrorMessage('No pudimos cargar las PQRS.');
+      }
+    } finally {
+      if (!silent && !signal?.aborted) {
+        setIsLoading(false);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    void loadPQRS({ signal: controller.signal });
+    return () => controller.abort();
+  }, [loadPQRS]);
+
+  const handleAssign = async (pqrs: PqrsItem): Promise<void> => {
+    if (!currentUser?.id) {
+      setErrorMessage('No fue posible identificar al usuario actual.');
+      return;
+    }
+    setAssigningId(pqrs.id);
+    setSuccessMessage(null);
+    setErrorMessage(null);
+    try {
+      await actualizarPQRS(pqrs.id, { responsableId: currentUser.id });
+      setSuccessMessage('PQRS asignada correctamente.');
+      await loadPQRS({ silent: true });
+    } catch (error) {
+      if (isHttpError(error)) {
+        setErrorMessage(error.message);
+      } else if (error instanceof Error) {
+        setErrorMessage(error.message);
+      } else {
+        setErrorMessage('No fue posible asignar la PQRS.');
+      }
+    } finally {
+      setAssigningId(null);
+    }
+  };
+
+  const resolveBadgeClass = (estado?: string | null): string => {
+    const normalized = (estado ?? '').toLowerCase();
+    if (normalized.includes('resu')) {
+      return 'status-badge status-resolved';
+    }
+    return 'status-badge status-review';
+  };
 
   return (
     <div className="admin-portal">
@@ -70,6 +127,12 @@ const GestionPQRS: React.FC = () => {
           </div>
         </div>
 
+        <div className="table-meta">
+          {isLoading && <div className="table-loading">Cargando PQRS…</div>}
+          {errorMessage && <div className="table-error">{errorMessage}</div>}
+          {successMessage && <div className="table-success">{successMessage}</div>}
+        </div>
+
         {/* Tabla de PQRS */}
         <div className="table-card">
           <table className="pqrs-table">
@@ -87,28 +150,34 @@ const GestionPQRS: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {pqrsList.map((pqrs) => (
-                <tr key={pqrs.id}>
-                  <td>{pqrs.id}</td>
-                  <td>{pqrs.paciente}</td>
-                  <td>{pqrs.tipo}</td>
-                  <td>
-                    <span
-                      className={`status-badge ${
-                        pqrs.estado === 'Resuelta' ? 'status-resolved' : 'status-review'
-                      }`}
-                    >
-                      {pqrs.estado}
-                    </span>
+              {!isLoading && pqrsList.length === 0 && (
+                <tr>
+                  <td colSpan={9}>
+                    <div className="table-empty">No hay solicitudes registradas.</div>
                   </td>
-                  <td>{pqrs.fechaRadicado}</td>
-                  <td>{pqrs.sla}</td>
-                  <td>{pqrs.responsable}</td>
-                  <td>{pqrs.fechaCompromiso}</td>
+                </tr>
+              )}
+              {pqrsList.map((pqrs) => (
+                <tr key={String(pqrs.id)}>
+                  <td>{pqrs.codigo}</td>
+                  <td>{toDisplay(pqrs.pacienteId)}</td>
+                  <td>{toDisplay(pqrs.tipo)}</td>
                   <td>
-                    <a href="#asignar" className="link-assign">
-                      Asignar
-                    </a>
+                    <span className={resolveBadgeClass(pqrs.estado)}>{toDisplay(pqrs.estado)}</span>
+                  </td>
+                  <td>{formatDate(pqrs.fechaRadicado)}</td>
+                  <td>{formatSla(pqrs.sla)}</td>
+                  <td>{toDisplay(pqrs.responsable ?? 'No asignado')}</td>
+                  <td>{formatDate(pqrs.fechaCompromiso)}</td>
+                  <td>
+                    <button
+                      type="button"
+                      className="link-assign"
+                      onClick={() => void handleAssign(pqrs)}
+                      disabled={assigningId === pqrs.id}
+                    >
+                      {assigningId === pqrs.id ? 'Asignando…' : 'Asignar'}
+                    </button>
                   </td>
                 </tr>
               ))}

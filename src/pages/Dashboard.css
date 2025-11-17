@@ -63,6 +63,31 @@
   color: #065F46;
 }
 
+.status-pending {
+  background-color: #FEF3C7;
+  color: #92400E;
+}
+
+.status-unread {
+  background-color: #FEE2E2;
+  color: #991B1B;
+}
+
+.appointment-empty {
+  padding: 20px;
+  border-radius: 12px;
+  background-color: #ffffff;
+  border: 1px dashed #CBD5F5;
+  color: #1A2B6C;
+  font-weight: 500;
+}
+
+.appointment-empty.error {
+  border-color: #FECACA;
+  color: #991B1B;
+  background-color: #FEF2F2;
+}
+
 .appointment-details {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -151,8 +176,9 @@
 }
 
 .quick-actions-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 20px;
 }
 
@@ -169,6 +195,8 @@
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
   min-height: 160px;
+  flex: 0 1 260px;
+  width: 260px;
 }
 
 .quick-action-card:hover {
@@ -205,12 +233,6 @@
   color: #A855F7;
 }
 
-@media (max-width: 1024px) {
-  .quick-actions-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
 @media (max-width: 768px) {
   .portal-content {
     padding: 24px 20px;
@@ -229,20 +251,25 @@
     gap: 20px;
   }
 
+  .quick-actions-section {
+    margin-top: 32px;
+  }
+
   .quick-actions-grid {
-    grid-template-columns: repeat(2, 1fr);
     gap: 16px;
   }
 
   .quick-action-card {
     padding: 24px 16px;
     min-height: 140px;
+    flex: 1 1 100%;
+    width: 100%;
   }
 }
 
 @media (max-width: 480px) {
-  .quick-actions-grid {
-    grid-template-columns: 1fr;
+  .quick-action-card {
+    min-width: 100%;
   }
 }
 

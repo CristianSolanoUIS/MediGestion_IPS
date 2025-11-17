@@ -62,6 +62,13 @@ export async function listarCitas(params: ListarCitasParams = {}, signal?: Abort
   });
 }
 
+export async function listarMisCitas(signal?: AbortSignal): Promise<CitaDetalle[]> {
+  return request<CitaDetalle[]>('/citas/mias', {
+    method: 'GET',
+    signal
+  });
+}
+
 export async function reprogramarCita(id: number | string, payload: ReprogramarCitaPayload, signal?: AbortSignal): Promise<CitaDetalle> {
   return request<CitaDetalle>(`/citas/${id}/reprogramar`, {
     method: 'PATCH',
@@ -109,6 +116,13 @@ export async function marcarCitaNoAsistida(id: number | string, signal?: AbortSi
 export async function fetchCitaPorId(id: number | string, signal?: AbortSignal): Promise<CitaDetalle> {
   return request<CitaDetalle>(`/citas/${id}`, {
     method: 'GET',
+    signal
+  });
+}
+
+export async function eliminarCita(id: number | string, signal?: AbortSignal): Promise<void> {
+  await request(`/citas/${id}`, {
+    method: 'DELETE',
     signal
   });
 }

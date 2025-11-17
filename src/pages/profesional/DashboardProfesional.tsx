@@ -4,7 +4,7 @@ import NavbarProfesional from '../../components/NavbarProfesional';
 import '../../styles/ProfesionalPortal.css';
 import './DashboardProfesional.css';
 import { fetchProfile } from '../../services/authService';
-import { listarAgendas, type AgendaResponse } from '../../services/agendas';
+import { listarAgendas, type AgendaResponse } from '../../services/agendaService';
 
 // Ya no se gestionan citas aquí; solo métricas de agenda y accesos rápidos.
 
