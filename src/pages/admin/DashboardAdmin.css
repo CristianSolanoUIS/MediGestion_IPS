@@ -46,6 +46,16 @@
   font-weight: 500;
 }
 
+.dashboard-error {
+  margin-top: -12px;
+  margin-bottom: 32px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background-color: rgba(249, 115, 22, 0.1);
+  color: #C2410C;
+  font-size: 14px;
+}
+
 /* Módulos de Gestión */
 .modules-section {
   margin-top: 40px;

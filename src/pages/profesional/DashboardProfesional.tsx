@@ -1,101 +1,79 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import NavbarProfesional from '../../components/NavbarProfesional';
 import '../../styles/ProfesionalPortal.css';
 import './DashboardProfesional.css';
+import { fetchProfile } from '../../services/authService';
+import { listarAgendas, type AgendaResponse } from '../../services/agendas';
 
-interface CitaDelDia {
-  id: string;
-  paciente: string;
-  hora: string;
-  estado: string;
-}
+// Ya no se gestionan citas aquí; solo métricas de agenda y accesos rápidos.
 
 const DashboardProfesional: React.FC = () => {
   const navigate = useNavigate();
+  const [displayName, setDisplayName] = useState<string>('Profesional');
+  const [professionalId, setProfessionalId] = useState<number | null>(null);
+  const [agendas, setAgendas] = useState<AgendaResponse[]>([]);
+  const [agendasLoading, setAgendasLoading] = useState<boolean>(false);
+  const [agendasError, setAgendasError] = useState<string | null>(null);
 
-  const citasDelDia: CitaDelDia[] = [
-    {
-      id: 'C-10234',
-      paciente: 'Paciente 1',
-      hora: '10:30:00',
-      estado: 'Confirmada'
-    },
-    {
-      id: 'C-10235',
-      paciente: 'Paciente 2',
-      hora: '11:30:00',
-      estado: 'Pendiente'
-    },
-    {
-      id: 'C-10236',
-      paciente: 'Paciente 3',
-      hora: '14:00:00',
-      estado: 'Confirmada'
-    }
-  ];
+  useEffect(() => {
+    let mounted = true;
+    const controller = new AbortController();
+    const load = async (): Promise<void> => {
+      try {
+        const profile = await fetchProfile(controller.signal);
+        if (!mounted) return;
+        setDisplayName(profile.user.nombre ?? 'Profesional');
+        setProfessionalId(profile.user.id);
+        setAgendasLoading(true);
+        const agendasData = await listarAgendas({ profesionalId: profile.user.id }, controller.signal);
+        if (!mounted) return;
+        setAgendas(agendasData);
+      } catch (error) {
+        if (!mounted) return;
+        setAgendasError(error instanceof Error ? error.message : 'No fue posible cargar tus agendas');
+      } finally {
+        if (mounted) {
+          setAgendasLoading(false);
+        }
+      }
+    };
+    void load();
+    return () => {
+      mounted = false;
+      controller.abort();
+    };
+  }, []);
 
-  const fechaActual = new Date().toLocaleDateString('es-ES', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric'
-  });
+  // Se elimina la lógica de citas: no se cargan ni se actualizan estados.
+
+  const metricAgendas = agendas.length;
+  const metricCupos = useMemo(() => agendas.reduce((acc, agenda) => acc + (agenda.cupos ?? 0), 0), [agendas]);
+  // Se elimina métrica de cupos disponibles.
 
   return (
     <div className="profesional-portal">
       <NavbarProfesional />
       <div className="portal-content">
-        {/* Encabezado */}
         <div className="welcome-header">
-          <h1 className="welcome-title">Dashboard Profesional</h1>
-          <p className="welcome-subtitle">Gestiona tu agenda y pacientes</p>
+          <h1 className="welcome-title">Hola, {displayName}</h1>
+          <p className="welcome-subtitle">Gestiona tu agenda y recursos disponibles</p>
         </div>
 
-        {/* Tarjetas de métricas */}
+        {/* Métricas de agenda */}
         <div className="metrics-grid">
           <div className="metric-card">
-            <div className="metric-value metric-blue">[Placeholder]</div>
-            <div className="metric-label">Citas del Día</div>
+            <div className="metric-value metric-blue">{metricAgendas}</div>
+            <div className="metric-label">Agendas activas</div>
           </div>
           <div className="metric-card">
-            <div className="metric-value metric-green">[Placeholder]</div>
-            <div className="metric-label">Atendidas</div>
-          </div>
-          <div className="metric-card">
-            <div className="metric-value metric-orange">[Placeholder]</div>
-            <div className="metric-label">Pendientes</div>
+            <div className="metric-value metric-green">{metricCupos}</div>
+            <div className="metric-label">Cupos publicados</div>
           </div>
         </div>
 
-        {/* Card Citas del Día */}
-        <div className="citas-card">
-          <h2 className="citas-card-title">Citas del Día - {fechaActual}</h2>
-          <div className="citas-list">
-            {citasDelDia.map((cita) => (
-              <div key={cita.id} className="cita-row">
-                <div className="cita-row-left">
-                  <div className="cita-icon">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M10 5V10L13.3333 11.6667M18.3333 10C18.3333 14.6024 14.6024 18.3333 10 18.3333C5.39763 18.3333 1.66667 14.6024 1.66667 10C1.66667 5.39763 5.39763 1.66667 10 1.66667C14.6024 1.66667 18.3333 5.39763 18.3333 10Z" stroke="#999" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </div>
-                  <div className="cita-info">
-                    <div className="cita-paciente">{cita.paciente}</div>
-                    <div className="cita-id">ID Cita: {cita.id}</div>
-                  </div>
-                </div>
-                <div className="cita-row-right">
-                  <div className="cita-hora">{cita.hora}</div>
-                  <span className={`status-badge ${
-                    cita.estado === 'Confirmada' ? 'status-confirmed' : 'status-pending'
-                  }`}>
-                    {cita.estado}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        {agendasError && <div className="info-banner error">{agendasError}</div>}
+        {agendasLoading && <div className="info-banner muted">Cargando tus agendas...</div>}
 
         {/* Sección de acciones principales */}
         <div className="actions-grid">

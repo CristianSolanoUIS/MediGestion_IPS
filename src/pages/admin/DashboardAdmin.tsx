@@ -1,11 +1,178 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import NavbarAdmin from '../../components/NavbarAdmin';
 import '../../styles/AdminPortal.css';
 import './DashboardAdmin.css';
+import { request, isHttpError } from '../../services/httpClient';
+
+interface AppointmentLike {
+  estado?: string | null;
+  estadoCodigo?: string | null;
+  estadoCita?: Record<string, unknown> | null;
+  [key: string]: unknown;
+}
+
+interface PqrsLike {
+  estado?: string | null;
+  [key: string]: unknown;
+}
+
+interface DashboardMetrics {
+  totalAppointments: number;
+  checkIns: number;
+  pending: number;
+  activePqrs: number;
+}
+
+const INITIAL_METRICS: DashboardMetrics = {
+  totalAppointments: 0,
+  checkIns: 0,
+  pending: 0,
+  activePqrs: 0
+};
+
+const PENDING_STATUSES = new Set(['pendiente', 'confirmada', 'reprogramada']);
+
+const ACTIVE_PQRS_STATUSES = new Set(['abierto', 'en progreso']);
+
+const CHECK_IN_STATUS = 'ensala';
+
+const extractArray = <T,>(payload: unknown): T[] => {
+  if (Array.isArray(payload)) {
+    return payload as T[];
+  }
+
+  if (payload && typeof payload === 'object') {
+    const candidates = ['items', 'data', 'results', 'content'];
+    for (const key of candidates) {
+      const value = (payload as Record<string, unknown>)[key];
+      if (Array.isArray(value)) {
+        return value as T[];
+      }
+    }
+  }
+
+  return [];
+};
+
+const normalizeStatus = (value?: string | null): string => value?.trim().toLowerCase() ?? '';
+
+const getTodayDateString = (): string => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = `${now.getMonth() + 1}`.padStart(2, '0');
+  const day = `${now.getDate()}`.padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+const resolveAppointmentStatus = (appointment: AppointmentLike): string => {
+  const primary = (appointment.estadoCodigo as string | undefined) ?? (appointment.estado as string | undefined);
+  const normalizedPrimary = normalizeStatus(primary);
+  if (normalizedPrimary) {
+    return normalizedPrimary;
+  }
+
+  const estadoCita = appointment.estadoCita;
+  if (estadoCita && typeof estadoCita === 'object') {
+    const record = estadoCita as Record<string, unknown>;
+    const fromNombre = normalizeStatus((record.nombre as string | undefined) ?? (record.estado as string | undefined));
+    if (fromNombre) {
+      return fromNombre;
+    }
+  }
+
+  if (appointment.estado && typeof appointment.estado === 'object') {
+    const record = appointment.estado as Record<string, unknown>;
+    const nested = normalizeStatus(record.nombre as string | undefined);
+    if (nested) {
+      return nested;
+    }
+  }
+
+  return '';
+};
 
 const DashboardAdmin: React.FC = () => {
   const navigate = useNavigate();
+  const [metrics, setMetrics] = useState<DashboardMetrics>(INITIAL_METRICS);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const loadMetrics = async (): Promise<void> => {
+      setIsLoading(true);
+      setErrorMessage(null);
+
+      try {
+        const [appointmentsResponse, pqrsResponse] = await Promise.all([
+          request<unknown>('/citas', {
+            query: { fecha: getTodayDateString() },
+            signal: controller.signal
+          }),
+          request<unknown>('/pqrs', { signal: controller.signal })
+        ]);
+
+        const appointments = extractArray<AppointmentLike>(appointmentsResponse);
+        const pqrs = extractArray<PqrsLike>(pqrsResponse);
+
+        const totalAppointments = appointments.length;
+
+        const checkIns = appointments.filter((appointment) => resolveAppointmentStatus(appointment) === CHECK_IN_STATUS).length;
+
+        const pending = appointments.filter((appointment) => {
+          const status = resolveAppointmentStatus(appointment);
+          return status && PENDING_STATUSES.has(status);
+        }).length;
+
+        const activePqrs = pqrs.filter((item) => {
+          const status = normalizeStatus(item.estado as string | undefined);
+          if (!status) {
+            return true;
+          }
+          if (ACTIVE_PQRS_STATUSES.has(status)) {
+            return true;
+          }
+          return false;
+        }).length;
+
+        setMetrics({ totalAppointments, checkIns, pending, activePqrs });
+      } catch (error) {
+        if (controller.signal.aborted) {
+          return;
+        }
+
+        if (isHttpError(error)) {
+          setErrorMessage(error.message);
+        } else if (error instanceof Error) {
+          setErrorMessage(error.message);
+        } else {
+          setErrorMessage('No se pudieron cargar los datos del dashboard.');
+        }
+      } finally {
+        if (!controller.signal.aborted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    loadMetrics();
+
+    return () => {
+      controller.abort();
+    };
+  }, []);
+
+  const metricDisplay = useMemo(
+    () => ({
+      totalAppointments: metrics.totalAppointments.toLocaleString('es-CO'),
+      checkIns: metrics.checkIns.toLocaleString('es-CO'),
+      pending: metrics.pending.toLocaleString('es-CO'),
+      activePqrs: metrics.activePqrs.toLocaleString('es-CO')
+    }),
+    [metrics]
+  );
 
   return (
     <div className="admin-portal">
@@ -20,22 +187,28 @@ const DashboardAdmin: React.FC = () => {
         {/* Tarjetas de métricas */}
         <div className="metrics-grid">
           <div className="metric-card">
-            <div className="metric-value metric-blue">[Placeholder]</div>
+            <div className="metric-value metric-blue">{isLoading ? '…' : metricDisplay.totalAppointments}</div>
             <div className="metric-label">Citas Hoy</div>
           </div>
           <div className="metric-card">
-            <div className="metric-value metric-green">[Placeholder]</div>
+            <div className="metric-value metric-green">{isLoading ? '…' : metricDisplay.checkIns}</div>
             <div className="metric-label">Check-ins</div>
           </div>
           <div className="metric-card">
-            <div className="metric-value metric-orange">[Placeholder]</div>
+            <div className="metric-value metric-orange">{isLoading ? '…' : metricDisplay.pending}</div>
             <div className="metric-label">Pendientes</div>
           </div>
           <div className="metric-card">
-            <div className="metric-value metric-purple">[Placeholder]</div>
+            <div className="metric-value metric-purple">{isLoading ? '…' : metricDisplay.activePqrs}</div>
             <div className="metric-label">PQRS Activas</div>
           </div>
         </div>
+
+        {errorMessage && (
+          <div className="dashboard-error">
+            {errorMessage}
+          </div>
+        )}
 
         {/* Módulos de Gestión */}
         <div className="modules-section">

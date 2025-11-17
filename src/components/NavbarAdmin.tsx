@@ -9,14 +9,40 @@ const NavbarAdmin: React.FC = () => {
     <nav className="navbar-admin">
       <div className="navbar-left">
         <div className="navbar-logo">
-          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="40" height="40" rx="10" fill="#F97316"/>
-            <path d="M20 12C18.8954 12 18 12.8954 18 14V16C18 17.1046 18.8954 18 20 18C21.1046 18 22 17.1046 22 16V14C22 12.8954 21.1046 12 20 12Z" fill="white"/>
-            <path d="M20 20C18.3431 20 17 21.3431 17 23V25C17 26.6569 18.3431 28 20 28C21.6569 28 23 26.6569 23 25V23C23 21.3431 21.6569 20 20 20Z" fill="white"/>
-            <circle cx="20" cy="15" r="2" fill="white"/>
-            <circle cx="20" cy="24" r="2" fill="white"/>
-            <path d="M12 20L14 22L16 20" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M24 20L26 22L28 20" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <svg width="40" height="40" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+            <defs>
+              <linearGradient id="adminPortalGradient" x1="12" y1="10" x2="38" y2="40" gradientUnits="userSpaceOnUse">
+                <stop stopColor="#F97316" />
+                <stop offset="1" stopColor="#FB923C" />
+              </linearGradient>
+            </defs>
+            <rect x="6" y="6" width="36" height="36" rx="11" fill="url(#adminPortalGradient)" />
+            <rect
+              x="16"
+              y="14"
+              width="16"
+              height="22"
+              rx="3.5"
+              stroke="white"
+              strokeWidth="1.8"
+              fill="white"
+              fillOpacity="0.08"
+            />
+            <path d="M20.5 12H27.5C28.6046 12 29.5 12.8954 29.5 14V16.5H18.5V14C18.5 12.8954 19.3954 12 20.5 12Z" fill="white" fillOpacity="0.9" />
+            <rect x="21.5" y="10" width="5" height="4" rx="2" fill="white" />
+            <path d="M20 20H28" stroke="white" strokeWidth="1.6" strokeLinecap="round" opacity="0.85" />
+            <path d="M20 24H26" stroke="white" strokeWidth="1.6" strokeLinecap="round" opacity="0.7" />
+            <path d="M20 28H25" stroke="white" strokeWidth="1.6" strokeLinecap="round" opacity="0.6" />
+            <path d="M18.5 23L20 24.5L22.5 22" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <circle cx="31.5" cy="29.5" r="4.7" stroke="white" strokeWidth="1.5" fill="none" />
+            <path d="M31.5 24.8V26.3" stroke="white" strokeWidth="1.3" strokeLinecap="round" />
+            <path d="M31.5 32.7V34.2" stroke="white" strokeWidth="1.3" strokeLinecap="round" />
+            <path d="M27.8 29.5H26.3" stroke="white" strokeWidth="1.3" strokeLinecap="round" />
+            <path d="M36.7 29.5H35.2" stroke="white" strokeWidth="1.3" strokeLinecap="round" />
+            <path d="M28.5 26.2L27.4 25.1" stroke="white" strokeWidth="1.3" strokeLinecap="round" />
+            <path d="M35.6 33.4L34.5 32.3" stroke="white" strokeWidth="1.3" strokeLinecap="round" />
+            <path d="M34.5 26.7L33.4 27.8" stroke="white" strokeWidth="1.3" strokeLinecap="round" />
+            <path d="M29.6 32.8L28.5 33.9" stroke="white" strokeWidth="1.3" strokeLinecap="round" />
           </svg>
         </div>
         <div className="navbar-brand">

@@ -10,11 +10,39 @@ const Navbar: React.FC = () => {
     <nav className="navbar">
       <div className="navbar-left">
         <div className="navbar-logo">
-          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="40" height="40" rx="8" fill="#1A67FD"/>
-            <path d="M20 12C17.8 12 16 13.8 16 16C16 18.2 17.8 20 20 20C22.2 20 24 18.2 24 16C24 13.8 22.2 12 20 12ZM20 22C17.2 22 14 23.2 14 26V28H26V26C26 23.2 22.8 22 20 22Z" fill="white"/>
-            <path d="M16 14H18V16H16V14Z" fill="white"/>
-            <path d="M22 14H24V16H22V14Z" fill="white"/>
+          <svg width="40" height="40" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+            <defs>
+              <linearGradient id="patientPortalGradient" x1="12" y1="8" x2="36" y2="40" gradientUnits="userSpaceOnUse">
+                <stop stopColor="#1D4ED8" />
+                <stop offset="1" stopColor="#3B82F6" />
+              </linearGradient>
+            </defs>
+            <rect x="6" y="6" width="36" height="36" rx="12" fill="url(#patientPortalGradient)" />
+            <path
+              d="M24 31.5L17.4 25.2C15.6 23.5 15.6 20.7 17.4 19C19 17.4 21.7 17.4 23.3 19L24 19.7L24.7 19C26.3 17.4 29 17.4 30.6 19C32.4 20.7 32.4 23.5 30.6 25.2L24 31.5Z"
+              fill="white"
+              stroke="white"
+              strokeWidth="1.3"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M14 29.5C14 29.5 17 34 24 34C31 34 34 29.5 34 29.5"
+              stroke="white"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              opacity="0.85"
+            />
+            <path
+              d="M12 26V31C12 33.2091 13.7909 35 16 35H32C34.2091 35 36 33.2091 36 31V26"
+              stroke="white"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              opacity="0.65"
+            />
+            <circle cx="18" cy="22" r="1.2" fill="white" opacity="0.8" />
+            <circle cx="30" cy="22" r="1.2" fill="white" opacity="0.8" />
           </svg>
         </div>
         <div className="navbar-brand">

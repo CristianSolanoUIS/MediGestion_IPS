@@ -42,94 +42,35 @@
   font-weight: 500;
 }
 
-/* Card Citas del Día */
-.citas-card {
-  background-color: #ffffff;
-  border-radius: 16px;
-  border: 1px solid #E3E6F0;
-  padding: 32px;
-  margin-bottom: 32px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-
-.citas-card-title {
-  font-size: 22px;
-  font-weight: 700;
-  color: #111;
-  margin: 0 0 24px 0;
-}
-
-.citas-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.cita-row {
-  background-color: #ffffff;
-  border: 1px solid #E3E6F0;
+.info-banner {
+  margin: 16px 0;
+  padding: 14px 18px;
   border-radius: 12px;
-  padding: 16px 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  transition: box-shadow 0.2s ease;
+  font-size: 14px;
 }
 
-.cita-row:hover {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+.info-banner.error {
+  background-color: #fee2e2;
+  color: #b91c1c;
 }
 
-.cita-row-left {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  flex: 1;
+.info-banner.muted {
+  background-color: #f8fafc;
+  color: #475569;
 }
 
-.cita-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  background-color: #F5F7FF;
-  border-radius: 50%;
+.info-banner.success {
+  background-color: #dcfce7;
+  color: #166534;
 }
 
-.cita-info {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.cita-paciente {
-  font-size: 16px;
-  font-weight: 700;
-  color: #111;
-}
-
-.cita-id {
-  font-size: 13px;
-  color: #666;
-}
-
-.cita-row-right {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.cita-hora {
-  font-size: 15px;
-  color: #333;
-  font-weight: 600;
-}
+/* Se eliminaron estilos de citas del día */
 
 /* Acciones principales */
 .actions-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 320px));
+  justify-content: center;
   gap: 24px;
 }
 
@@ -141,10 +82,18 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+  max-width: 320px;
 }
 
 .action-card-header {
   margin-bottom: 20px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .action-icon {
@@ -157,6 +106,7 @@
   font-weight: 700;
   color: #111;
   margin: 0 0 8px 0;
+  text-align: center;
 }
 
 .action-card-subtitle {
@@ -164,6 +114,7 @@
   color: #666;
   margin: 0 0 24px 0;
   flex: 1;
+  text-align: center;
 }
 
 .btn-primary-blue {
@@ -181,6 +132,24 @@
 
 .btn-primary-blue:hover {
   background-color: #155DFC;
+  transform: translateY(-1px);
+}
+
+.btn-primary-purple {
+  width: 100%;
+  height: 48px;
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.btn-primary-purple:hover {
+  filter: brightness(1.05);
   transform: translateY(-1px);
 }
 
@@ -211,15 +180,6 @@
     grid-template-columns: 1fr;
   }
 
-  .cita-row {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-  }
-
-  .cita-row-right {
-    width: 100%;
-    justify-content: space-between;
-  }
+  /* Ya no hay filas de citas en vista móvil */
 }
 

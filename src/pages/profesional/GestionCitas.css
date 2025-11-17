@@ -1,0 +1,500 @@
+.citas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+  justify-content: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.citas-column {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin: 0 0 32px;
+}
+
+.quick-card {
+  background: #0f172a;
+  border-radius: 24px;
+  padding: 24px;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.quick-card:nth-child(2) {
+  background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+}
+
+.quick-card h3 {
+  margin: 6px 0;
+  font-size: 20px;
+}
+
+.quick-card p {
+  margin: 0;
+  opacity: 0.85;
+}
+
+.quick-card-tag {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.inline-date {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  color: #475569;
+}
+
+.inline-date input {
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 14px;
+}
+
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.card-header h2 {
+  font-size: 20px;
+  margin: 0;
+  color: #0f172a;
+}
+
+.card-header p {
+  margin: 4px 0 0;
+  color: #64748b;
+}
+
+.card-header.between {
+  justify-content: space-between;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.form-grid label,
+.consulta-form label,
+.split-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  color: #475569;
+}
+
+.form-grid input,
+.form-grid select,
+.form-grid textarea,
+.consulta-form input,
+.split-form input,
+.split-form select,
+.card textarea,
+.input-with-button input,
+.range-inputs input {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+}
+
+.form-grid input:focus,
+.form-grid select:focus,
+.form-grid textarea:focus,
+.consulta-form input:focus,
+.split-form input:focus,
+.input-with-button input:focus,
+.range-inputs input:focus,
+.card textarea:focus {
+  outline: none;
+  border-color: #2563eb;
+}
+
+.form-grid select:disabled {
+  background: #f8fafc;
+  color: #94a3b8;
+}
+
+.field-hint {
+  font-size: 12px;
+  color: #94a3b8;
+  margin-top: 2px;
+}
+
+.card textarea,
+.consulta-form textarea,
+.split-form textarea {
+  min-height: 88px;
+  resize: vertical;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 1200;
+}
+
+.modal {
+  background: #fff;
+  border-radius: 24px;
+  width: min(640px, 100%);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 50px rgba(15, 23, 42, 0.25);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px 12px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.modal-body {
+  padding: 16px 24px 24px;
+  overflow-y: auto;
+}
+
+.modal-close {
+  border: none;
+  background: transparent;
+  font-size: 28px;
+  cursor: pointer;
+  line-height: 1;
+  color: #94a3b8;
+}
+
+.full-row {
+  grid-column: 1 / -1;
+}
+
+.form-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-primary-green,
+.btn-primary-blue,
+.btn-secondary,
+.btn-danger,
+.acciones-grid button,
+.split-form button {
+  border: none;
+  border-radius: 14px;
+  padding: 10px 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-primary-green {
+  background: linear-gradient(120deg, #16a34a, #22c55e);
+  color: #fff;
+}
+
+.btn-primary-blue {
+  background: linear-gradient(120deg, #2563eb, #3b82f6);
+  color: #fff;
+}
+
+.btn-secondary {
+  background: #eef2ff;
+  color: #4c1d95;
+}
+
+.btn-danger {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.btn-danger.full-width {
+  width: 100%;
+  text-align: center;
+  margin-top: 8px;
+}
+
+.btn-primary-green:disabled,
+.btn-primary-blue:disabled,
+.btn-secondary:disabled,
+.btn-danger:disabled,
+.acciones-grid button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-primary-green:hover:not(:disabled),
+.btn-primary-blue:hover:not(:disabled),
+.btn-secondary:hover:not(:disabled),
+.btn-danger:hover:not(:disabled),
+.acciones-grid button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.15);
+}
+
+.consulta-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.input-with-button {
+  display: flex;
+  gap: 8px;
+}
+
+.input-with-button button {
+  flex-shrink: 0;
+}
+
+.acciones-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.acciones-grid button {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.acciones-compact {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.acciones-compact button {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 10px 16px;
+  background: #fff;
+  font-weight: 600;
+  color: #0f172a;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.acciones-compact button:hover:not(:disabled) {
+  border-color: #2563eb;
+}
+
+.split-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+  align-items: end;
+}
+
+.form-status {
+  grid-column: 1 / -1;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 14px;
+}
+
+.form-status.success {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.form-status.error {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.info-banner {
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 14px;
+}
+
+.info-banner.error {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.info-banner.muted {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.citas-list,
+.agenda-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cita-row {
+  width: 100%;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 14px 18px;
+  background: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cita-row.active {
+  border-color: #2563eb;
+  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.12);
+}
+
+.cita-time {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.cita-paciente {
+  margin: 4px 0 0;
+  color: #475569;
+  font-size: 14px;
+}
+
+.cita-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  font-size: 12px;
+  color: #475569;
+}
+
+.cita-chip {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #4338ca;
+  font-weight: 600;
+}
+
+.cita-date {
+  font-size: 12px;
+}
+
+.detalle-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+}
+
+.detalle-grid .label {
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+.detalle-grid .value {
+  margin: 4px 0 0;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.detalle-grid .value.status {
+  color: #1d4ed8;
+}
+
+.detalle-grid .full-row {
+  grid-column: 1 / -1;
+}
+
+.detalle-empty {
+  padding: 32px 0;
+  text-align: center;
+  color: #94a3b8;
+}
+
+.range-inputs {
+  display: flex;
+  gap: 12px;
+}
+
+.range-inputs label {
+  font-size: 12px;
+  color: #475569;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.agenda-item {
+  padding: 14px;
+  border-radius: 16px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+.agenda-id {
+  font-weight: 600;
+  margin: 0;
+  color: #0f172a;
+}
+
+.agenda-dates {
+  margin: 4px 0;
+  color: #475569;
+}
+
+.agenda-meta {
+  display: flex;
+  gap: 12px;
+  font-size: 13px;
+  color: #0f172a;
+}
+
+.agenda-blocks {
+  margin-top: 6px;
+  font-size: 13px;
+  color: #475569;
+}

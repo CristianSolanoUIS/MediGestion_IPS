@@ -9,10 +9,39 @@ const NavbarDirector: React.FC = () => {
     <nav className="navbar-director">
       <div className="navbar-left">
         <div className="navbar-logo">
-          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="40" height="40" rx="10" fill="#8B5CF6"/>
-            <path d="M20 8L12 12V20C12 26.6274 17.3726 32 24 32C30.6274 32 36 26.6274 36 20V12L28 8M20 8L28 8M20 8V32" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M12 20H20M28 20H36" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <svg width="40" height="40" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+            <defs>
+              <linearGradient id="directorPortalGradient" x1="10" y1="10" x2="38" y2="38" gradientUnits="userSpaceOnUse">
+                <stop stopColor="#7C3AED" />
+                <stop offset="1" stopColor="#C084FC" />
+              </linearGradient>
+            </defs>
+            <rect x="6" y="6" width="36" height="36" rx="12" fill="url(#directorPortalGradient)" />
+            <path
+              d="M18 14H30C31.1046 14 32 14.8954 32 16V26C32 30.6421 28.0019 34.9068 24 36C19.9981 34.9068 16 30.6421 16 26V16C16 14.8954 16.8954 14 18 14Z"
+              fill="white"
+              fillOpacity="0.08"
+              stroke="white"
+              strokeWidth="1.8"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M19 18L22.5 20.5L24 17L25.5 20.5L29 18"
+              stroke="white"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path
+              d="M18 28L22.5 24L26.5 27L32 20"
+              stroke="white"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <path d="M32 20H34.5C35.8807 20 37 21.1193 37 22.5V24" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+            <circle cx="33.5" cy="16.5" r="3" stroke="white" strokeWidth="1.5" />
+            <path d="M22 31H26" stroke="white" strokeWidth="1.5" strokeLinecap="round" opacity="0.7" />
           </svg>
         </div>
         <div className="navbar-brand">

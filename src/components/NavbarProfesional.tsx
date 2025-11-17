@@ -9,12 +9,35 @@ const NavbarProfesional: React.FC = () => {
     <nav className="navbar-profesional">
       <div className="navbar-left">
         <div className="navbar-logo">
-          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="40" height="40" rx="8" fill="#16A34A"/>
-            <path d="M20 12C17.8 12 16 13.8 16 16C16 18.2 17.8 20 20 20C22.2 20 24 18.2 24 16C24 13.8 22.2 12 20 12ZM20 22C17.2 22 14 23.2 14 26V28H26V26C26 23.2 22.8 22 20 22Z" fill="white"/>
-            <path d="M16 14H18V16H16V14Z" fill="white"/>
-            <path d="M22 14H24V16H22V14Z" fill="white"/>
-            <path d="M18 20H22V22H18V20Z" fill="white"/>
+          <svg width="40" height="40" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+            <defs>
+              <linearGradient id="professionalPortalGradient" x1="12" y1="10" x2="36" y2="40" gradientUnits="userSpaceOnUse">
+                <stop stopColor="#15803D" />
+                <stop offset="1" stopColor="#22C55E" />
+              </linearGradient>
+            </defs>
+            <rect x="6" y="6" width="36" height="36" rx="11" fill="url(#professionalPortalGradient)" />
+            <path
+              d="M18 14V23C18 26.3137 20.6863 29 24 29C27.3137 29 30 26.3137 30 23V14"
+              stroke="white"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <circle cx="18" cy="12" r="2" fill="white" />
+            <circle cx="30" cy="12" r="2" fill="white" />
+            <path
+              d="M18 26V28C18 31.3137 20.6863 34 24 34C27.3137 34 30 31.3137 30 28V26"
+              stroke="white"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <circle cx="24" cy="34" r="4" stroke="white" strokeWidth="1.8" fill="none" />
+            <path d="M24 38V40" stroke="white" strokeWidth="1.8" strokeLinecap="round" />
+            <path d="M22 34H26" stroke="white" strokeWidth="1.8" strokeLinecap="round" />
+            <path d="M14 18H18" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+            <path d="M16 16V20" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
           </svg>
         </div>
         <div className="navbar-brand">

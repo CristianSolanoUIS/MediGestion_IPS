@@ -1,70 +1,45 @@
-# Getting Started with Create React App
+# MediGestión IPS – Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Frontend de MediGestión IPS modernizado con [Vite](https://vitejs.dev/), React 19 y TypeScript.
 
-## Available Scripts
+## Requisitos
+- Node.js 18 LTS o superior
+- npm 9+
 
-In the project directory, you can run:
+## Scripts disponibles
+- `npm run dev`: levanta el servidor de desarrollo en `http://localhost:5173` (usa `--host` si necesitas exponerlo).
+- `npm run build`: chequea tipos y genera la carpeta `dist/` lista para producción.
+- `npm run preview`: sirve el build generado para validarlo localmente.
+- `npm test`: ejecuta Vitest en modo watch.
+- `npm run test:run`: ejecuta Vitest una sola vez (útil para CI).
 
-### `npm start`
+## Variables de entorno
+Coloca configuraciones en un archivo `.env` en la raíz. Para apuntar al backend expón, por ejemplo:
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+```
+VITE_API_BASE_URL=http://localhost:4000
+```
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+Dentro del código puedes leerla con `import.meta.env.VITE_API_BASE_URL`.
 
-### `npm test`
+## Integración con APIs
+- `src/config/env.ts` expone la URL base leída desde las variables de entorno.
+- `src/services/httpClient.ts` centraliza las peticiones `fetch` (maneja headers, parseo de JSON y errores HTTP) y adjunta el token Bearer cuando está disponible.
+- `src/services/authService.ts` contiene las llamadas específicas de autenticación (`/auth/login`, `/auth/profile`).
+- `src/services/authStorage.ts` encapsula la persistencia de token, usuario, roles y rol seleccionado en `localStorage`.
+- Tras autenticarse, `src/Login.tsx` guarda token/perfil y redirige según roles; si hay varias opciones, envía al selector `src/pages/RoleSelection.tsx` para persistir la elección y continuar.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Estructura
+- `src/` contiene componentes, páginas y estilos.
+- `public/` mantiene assets estáticos (manifiesto, iconos, etc.).
+- `index.html` en la raíz es la plantilla principal que carga `src/index.tsx`.
+- Puedes importar desde cualquier ruta usando `@/` como alias de `src/`.
+- Pantallas destacadas: `src/Login.tsx` integra la autenticación contra el backend y `src/pages/RoleSelection.tsx` se muestra post-login para elegir la vista según el rol asignado.
 
-### `npm run build`
+## Próximos pasos sugeridos
+- Centralizar las llamadas HTTP en `src/services/` utilizando `fetch` o `axios`.
+- Agregar manejo de estado/autenticación antes de integrar el backend.
+- Configurar rutas protegidas y roles si aplica.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## Testing
+Vitest está configurado con `jsdom` y `@testing-library`. Coloca los archivos de prueba junto a los componentes con sufijo `.test.tsx` o `.test.ts`.

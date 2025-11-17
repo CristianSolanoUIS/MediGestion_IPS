@@ -51,7 +51,7 @@ const Notificaciones: React.FC = () => {
     }
   ];
 
-  const getIcono = (tipoIcono: 'calendar' | 'check' | 'info'): JSX.Element | null => {
+  const getIcono = (tipoIcono: 'calendar' | 'check' | 'info'): React.ReactElement | null => {
     switch (tipoIcono) {
       case 'calendar':
         return (
