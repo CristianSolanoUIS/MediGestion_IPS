@@ -136,7 +136,7 @@ const normalizeAgenda = (raw: RawAgenda): AgendaResponse | null => {
       (raw as Record<string, unknown>).idPersonal
   );
   const rawBloques = (raw as Record<string, unknown>).bloques ?? (raw as Record<string, unknown>).bloquesHorarios ?? (raw as Record<string, unknown>).blocks;
-  const parsedBloques = parseBloques(rawBloques) ?? rawBloques;
+  const parsedBloques = (parseBloques(rawBloques) ?? (rawBloques as unknown)) as BloquesInput;
 
   const agenda: AgendaResponse = {
     id: id ?? 0,

@@ -13,7 +13,7 @@ import {
 } from '../services/notificaciones';
 import { isHttpError } from '../services/httpClient';
 
-const ICONOS: Record<NotificacionIcono, JSX.Element> = {
+const ICONOS: Record<NotificacionIcono, React.ReactElement> = {
   calendar: (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path

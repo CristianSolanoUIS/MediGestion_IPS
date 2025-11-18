@@ -615,8 +615,12 @@ const Reportes: React.FC = () => {
                     timeStyle: 'short'
                   });
               const description = reporte.descripcion?.trim() ?? `Reporte ${reporte.idReporte}`;
-              const pacienteInfo = pacientesMap.get(reporte.idPaciente);
-              const profesionalInfo = profesionalesMap.get(reporte.idGeneradoPor);
+              const pacienteInfo = pacientesMap.get(
+                typeof reporte.idPaciente === 'number' ? reporte.idPaciente : Number(reporte.idPaciente)
+              );
+              const profesionalInfo = profesionalesMap.get(
+                typeof reporte.idGeneradoPor === 'number' ? reporte.idGeneradoPor : Number(reporte.idGeneradoPor)
+              );
               return (
                 <div key={reporte.idReporte} className="reporte-card">
                   <div className="reporte-content">
