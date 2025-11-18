@@ -1,7 +1,7 @@
 import React, { useState, FormEvent, ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Navbar from '../components/Navbar';
-import '../styles/PatientPortal.css';
+import Navbar from '../../components/Navbar';
+import '../../styles/PatientPortal.css';
 import './AgendarCita.css';
 
 interface FormData {

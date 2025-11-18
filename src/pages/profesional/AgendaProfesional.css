@@ -413,9 +413,18 @@
     padding: 20px;
   }
 }
+.btn-primary-blue {
+  background-color: #1a67fd;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 18px;
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   transition: background-color 0.2s ease, transform 0.1s ease;
 }
 

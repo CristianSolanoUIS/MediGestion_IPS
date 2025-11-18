@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Navbar from '../components/Navbar';
-import '../styles/PatientPortal.css';
+import Navbar from '../../components/Navbar';
+import '../../styles/PatientPortal.css';
 import './Notificaciones.css';
 import {
   listarMisNotificaciones,
@@ -10,8 +10,8 @@ import {
   type NotificacionIcono,
   type NotificacionItem,
   estaLeida
-} from '../services/notificaciones';
-import { isHttpError } from '../services/httpClient';
+} from '../../services/notificaciones';
+import { isHttpError } from '../../services/httpClient';
 
 const ICONOS: Record<NotificacionIcono, React.ReactElement> = {
   calendar: (

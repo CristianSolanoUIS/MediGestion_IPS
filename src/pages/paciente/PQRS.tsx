@@ -1,12 +1,12 @@
 import React, { useState, FormEvent, ChangeEvent, useCallback, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Navbar from '../components/Navbar';
-import '../styles/PatientPortal.css';
+import Navbar from '../../components/Navbar';
+import '../../styles/PatientPortal.css';
 import './PQRS.css';
-import { listarPQRS, crearPQRS, type PqrsItem } from '../services/pqrs';
-import { listarMisCitas, type CitaDetalle } from '../services/citas';
-import { isHttpError } from '../services/httpClient';
-import { getUser } from '../services/authStorage';
+import { listarPQRS, crearPQRS, type PqrsItem } from '../../services/pqrs';
+import { listarMisCitas, type CitaDetalle } from '../../services/citas';
+import { isHttpError } from '../../services/httpClient';
+import { getUser } from '../../services/authStorage';
 
 interface PQRSFormData {
   tipo: string;

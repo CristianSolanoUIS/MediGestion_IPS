@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Navbar from '../components/Navbar';
-import '../styles/PatientPortal.css';
+import Navbar from '../../components/Navbar';
+import '../../styles/PatientPortal.css';
 import './Dashboard.css';
-import { fetchProfile } from '../services/authService';
-import { listarMisCitas, type CitaDetalle } from '../services/citas';
-import { isHttpError } from '../services/httpClient';
+import { fetchProfile } from '../../services/authService';
+import { listarMisCitas, type CitaDetalle } from '../../services/citas';
+import { isHttpError } from '../../services/httpClient';
 
 const toDateFromCita = (cita: CitaDetalle): Date | null => {
   if (!cita?.fecha) {

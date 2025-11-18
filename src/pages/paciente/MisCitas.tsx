@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Navbar from '../components/Navbar';
-import '../styles/PatientPortal.css';
+import Navbar from '../../components/Navbar';
+import '../../styles/PatientPortal.css';
 import './MisCitas.css';
 import {
   listarMisCitas,
@@ -9,8 +9,8 @@ import {
   marcarCitaEnSala,
   cancelarCita,
   type CitaDetalle
-} from '../services/citas';
-import { isHttpError } from '../services/httpClient';
+} from '../../services/citas';
+import { isHttpError } from '../../services/httpClient';
 
 const toDateFromCita = (cita: CitaDetalle): Date | null => {
   if (!cita?.fecha) {
