@@ -1,6 +1,7 @@
 import React, { useState, FormEvent, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Login.css';
+import logoImg from './logo_MediGestion.png';
 import { fetchProfile, login, AuthRole } from './services/authService';
 import { isHttpError } from './services/httpClient';
 import { setAccessToken, setRoles, setUser } from './services/authStorage';
@@ -75,10 +76,7 @@ const Login: React.FC = () => {
       <div className="login-card">
         {/* Icono superior */}
         <div className="login-icon">
-          <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="64" height="64" rx="16" fill="#1A67FD" opacity="0.1"/>
-            <path d="M32 20C28.7 20 26 22.7 26 26C26 29.3 28.7 32 32 32C35.3 32 38 29.3 38 26C38 22.7 35.3 20 32 20ZM32 35C27.6 35 22 37.1 22 41.5V44H42V41.5C42 37.1 36.4 35 32 35Z" fill="#1A67FD"/>
-          </svg>
+          <img src={logoImg} alt="MediGestión IPS" className="login-logo-img" />
         </div>
 
         {/* Título y subtítulo */}

@@ -39,6 +39,12 @@
   justify-content: center;
 }
 
+.login-logo-img {
+  width: 96px;
+  height: auto;
+  object-fit: contain;
+}
+
 /* Header con título y subtítulo */
 .login-header {
   text-align: center;

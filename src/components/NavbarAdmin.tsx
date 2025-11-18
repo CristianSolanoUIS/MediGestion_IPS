@@ -54,7 +54,7 @@ const NavbarAdmin: React.FC = () => {
         <div className="navbar-profile">
           <div className="profile-info">
             <div className="profile-name">Usuario Administrativo</div>
-            <div className="profile-id">ID Usuario: 0001 | Área: Administración</div>
+            <div className="profile-id">ID Usuario: 0001 | A?rea: AdministraciA3n</div>
           </div>
         </div>
         <div className="navbar-logout" onClick={() => navigate('/')}>
